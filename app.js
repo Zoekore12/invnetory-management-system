@@ -1,0 +1,23 @@
+const dotenv = require("dotenv").config();
+const connectDB = require('./Config/databaseConfig');
+const express = require('express');
+const app = express();
+const port = process.env.PORT
+const productRoute = require("./Routes/ProductRoute");
+const userRoutes = require("./Routes/UserRoute");
+const SalesRoute = require("./Routes/SalesRoute");
+
+
+app.use(express.json());//middleware
+
+connectDB();//connecting data
+
+app.use('/products',productRoute);
+
+app.use("/users", userRoutes);
+
+app.use("/sales", SalesRoute);
+
+app.listen(port, ()=>{
+    console.log(`Server started on port ${port}`);
+})
