@@ -14,7 +14,7 @@ const {createProduct,updateProduct,updateItem,getAllProducts,getProductById,dele
 //define routes
 router.post("/createProduct",authMiddleware,approvedRoles("Admin","SuperAdmin"),createProduct);
 router.put("/updateProducts/:id",authMiddleware,approvedRoles("Admin","SuperAdmin"),updateProduct);
-router.put("/updateItem/:id/item",authMiddleware,approvedRoles("Admin","SuperAdmin","StoreKeeper"),updateItem);
+router.put("/updateItem/:id",authMiddleware,approvedRoles("Admin","SuperAdmin","StoreKeeper"),updateItem);
 router.get("/getAllProducts",authMiddleware,approvedRoles("Admin","SuperAdmin","StoreKeeper","Cashier"),getAllProducts);
 router.get("/getProductById/:id",authMiddleware,approvedRoles("Admin","SuperAdmin","StoreKeeper","Cashier"),getProductById);
 router.delete("/deleteProduct/:id",authMiddleware,approvedRoles("Admin","SuperAdmin"),deleteProduct);

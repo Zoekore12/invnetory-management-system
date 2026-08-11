@@ -10,7 +10,7 @@ const {
 
 // SuperAdmin viewing all activities
 router.get(
-    "/",
+    "/getActivities",
     authMiddleware,
     approvedRoles("SuperAdmin"),
     getActivities

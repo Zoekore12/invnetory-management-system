@@ -1,6 +1,6 @@
 const Product = require("../Models/Products");
 
-const Activity = require("../Controllers/ActivityController");
+const {logActivity}= require("../Controllers/ActivityController");
 //creating product
 exports.createProduct = async (req, res) =>{
     try{
@@ -50,22 +50,19 @@ exports.createProduct = async (req, res) =>{
 exports.updateProduct = async (req,res)=>{
     try{
         const {id} = req.params;
-        const {name,size,description,price,quantity} = req.body;
+        const {name,size,description,price} = req.body;
         
-        const product = await Product.findByIdAndUpdate(id,{name,size,description,price,quantity},{new:true,runValidators:true});
+        const product = await Product.findByIdAndUpdate(id,{name,size,description,price},{new:true,runValidators:true});
         if(!product){
             return res.status(404).json({message: "Product not found"})
         }
         // Activity Logging
-        await Activity.logActivity({
+        await logActivity({
             userId: req.user.id,
             action: "Update Product",
             description: `Product ${product.name} updated`,
             resource: "Product",
             resourceId: product._id,
-            data: {
-                quantity: product.quantity
-            }
         });
         // Activity Logging
         await logActivity({
@@ -74,10 +71,6 @@ exports.updateProduct = async (req,res)=>{
             description: `Product ${product.name} updated`,
             resource: "Product",
             resourceId: product._id,
-            data: {
-                quantity: product.quantity,
-                price: product.price
-            }
         });
 
 
@@ -163,8 +156,8 @@ exports.deleteProduct = async (req,res)=>{
 exports.updateItem = async (req, res) => {
     try {
         const { id } = req.params;
-        const { action, quantity } = req.body;
-
+        const { action} = req.body;
+        const quantity = Number(req.body.quantity);
         // Check action
         if (!["add", "remove"].includes(action)) {
             return res.status(400).json({

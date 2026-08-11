@@ -6,6 +6,7 @@ const port = process.env.PORT
 const productRoute = require("./Routes/ProductRoute");
 const userRoutes = require("./Routes/UserRoute");
 const SalesRoute = require("./Routes/SalesRoute");
+const activityRoute = require("./Routes/ActivitiesRoute");
 
 
 app.use(express.json());//middleware
@@ -17,6 +18,8 @@ app.use('/products',productRoute);
 app.use("/users", userRoutes);
 
 app.use("/sales", SalesRoute);
+
+app.use('/activities',activityRoute);
 
 app.listen(port, ()=>{
     console.log(`Server started on port ${port}`);
