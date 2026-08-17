@@ -6,7 +6,7 @@ const authMiddleware = require("../Middleware/authMiddleware");
 const approvedRoles = require("../Middleware/ApprovedRole");
 
 //importing controller 
-const {registerUser,createUser,loginUser,updateUserProfile}= require("../Controllers/UserController");
+const {registerUser,createUser,loginUser,updateUserProfile,refreshToken,logOutUser}= require("../Controllers/UserController");
 //importing role-controller
 const {changeUserRole} = require("../Controllers/RoleController");
 
@@ -25,5 +25,10 @@ router.put("/changeUserRole/:id",
     approvedRoles("SuperAdmin"),
     changeUserRole
 );
+router.post("/refreshToken", refreshToken);
+
+router.post("/logOutUser",logOutUser);
+
+
 //export router
 module.exports = router;

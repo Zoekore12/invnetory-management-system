@@ -38,9 +38,8 @@ const userSchema = new mongoose.Schema({
         enum:["SuperAdmin","User","StoreKeeper","Admin","Cashier"],
         default:"User"
     },
-
 },
-{timestamp: true},//date created and updated
+{timestamps: true},//date created and updated
 );
 //model
 

@@ -1,6 +1,19 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const ms = require("ms");
+const crypto = require("crypto");
 const User = require("../Models/User");
+const RefreshToken = require("../Models/refreshToken");
+const {
+    refreshTokenRotationService
+} = require("../Services/refreshTokenRotationService");
+
+
+const {
+    generateToken,
+    generateRefreshToken,
+    hashRefreshToken
+} = require("../Services/refreshTokenService");
 
 //create a User
 
@@ -168,18 +181,33 @@ exports.loginUser = async (req, res)=>{
             })
         }
         //generate JWT 
-        const token = jwt.sign({
-            id:user._id,
-            email:user.email,
-            role:user.role
-        },
-        process.env.JWT_SECRET,
-        {
-            expiresIn: process.env.JWT_EXPIRES_IN
-        }
-        );
+        const token = generateToken(user);
+        // Generate Refresh Token
+        const newRefreshToken = generateRefreshToken();
+        // Save refresh token to database
+        const tokenHash = hashRefreshToken(newRefreshToken);
+        //expires in
+        const expiresAt = new Date(Date.now() + ms(process.env.JWT_REFRESH_EXPIRES_IN ));
+        //Save token to database
+        await RefreshToken.create({
+            userId: user._id,
+            tokenHash: tokenHash,
+            expiresAt: expiresAt
+        });
+        //cookie refresh 
+        res.cookie("refreshToken", newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production"
+                ? "none"
+                : "lax",
+            maxAge: ms(process.env.JWT_REFRESH_EXPIRES_IN)
+         });
         //password removal response
-         const {password: _, ...userData } = user.toObject();
+         const {password: _,
+            refreshToken,
+             ...userData 
+            } = user.toObject();
 
         res.status(200).json({
             success: true,
@@ -220,3 +248,109 @@ exports.updateUserProfile = async (req, res) =>{
         });
     }
 }
+exports.refreshToken = async (req, res) => {
+    try {
+
+        const { refreshToken } = req.cookies;
+        if (!refreshToken) {
+            return res.status(401).json({
+                success: false,
+                message: "Refresh token is required"
+            });
+        }
+
+        const tokenHash = hashRefreshToken(refreshToken);
+
+        const storedToken = await RefreshToken.findOne({
+            tokenHash: tokenHash
+        });
+
+        if (!storedToken) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid refresh token"
+            });
+        }
+
+        if (storedToken.expiresAt < new Date()) {
+
+            await RefreshToken.deleteOne({
+                _id: storedToken._id
+            });
+
+            return res.status(401).json({
+                success: false,
+                message: "Refresh token expired"
+            });
+        }
+
+        const user = await User.findById(
+            storedToken.userId
+        );
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const accessToken = generateToken(user);
+
+        return res.status(200).json({
+            success: true,
+            message: "Access token refreshed",
+            accessToken
+        });
+
+    } catch (error) {
+
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired refresh token"
+        });
+    }
+};
+exports.logOutUser = async (req, res) => {
+    try {
+
+        // Get refresh token from cookie
+        const { refreshToken } = req.cookies;
+
+        if (refreshToken) {
+
+            // Hash refresh token
+            const tokenHash = hashRefreshToken(
+                refreshToken
+            );
+
+            // Delete matching token from database
+            await RefreshToken.deleteOne({
+                tokenHash: tokenHash
+            });
+        }
+
+        // Clear refresh token cookie
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+
+            secure: process.env.NODE_ENV === "production",
+
+            sameSite: process.env.NODE_ENV === "production"
+                ? "none"
+                : "lax"
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Logout successful"
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            success: false,
+            message: "Error logging out",
+            error: error.message
+        });
+    }
+};
