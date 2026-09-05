@@ -1,7 +1,7 @@
 const ms = require("ms");
 
 const User = require("../Models/User");
-const RefreshToken = require("../Models/RefreshToken");
+const RefreshToken = require("../Models/refreshToken");
 
 const {
     generateToken,

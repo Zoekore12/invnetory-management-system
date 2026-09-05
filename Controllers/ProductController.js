@@ -1,6 +1,7 @@
 const Product = require("../Models/Products");
 
-const {logActivity}= require("../Controllers/ActivityController");
+const {uploadImageToCloudinary,deleteImageFromCloudinary} = require("../Services/cloudinaryService");
+const {logActivity}= require("./activityController");
 //creating product
 exports.createProduct = async (req, res) =>{
     try{
@@ -11,10 +12,28 @@ exports.createProduct = async (req, res) =>{
         ){
            return res.status(400).json({message: 'please input all required fields'});
         }
+        //uploading image
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "At least one product image is required"
+            });
+            }
+        const image = await Promise.all(
+            req.files.map(async (file) => {
+                const result = await uploadImageToCloudinary(file);
+
+                return {
+                    url: result.secure_url,
+                    public_id: result.public_id
+                };
+            })
+        );
 
         const product = new Product({
             name,
             size,
+            image,
             description,
             price,
             quantity
@@ -29,6 +48,7 @@ exports.createProduct = async (req, res) =>{
             resourceId: product._id,
             data: {
                 name: product.name,
+                image: product.image,
                 size: product.size,
                 price: product.price,
                 quantity: product.quantity

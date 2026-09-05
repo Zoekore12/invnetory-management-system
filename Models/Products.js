@@ -8,6 +8,18 @@ const productSchema = new mongoose.Schema({
         type : String,
         required: true
     },
+    image :[
+        {
+            url : {
+                type : String,
+                default: null
+            },
+            publicId : {
+                type: String,
+                default: null
+            }
+        }
+        ],
     description :{
         type : String,
         required: true

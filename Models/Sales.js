@@ -30,7 +30,7 @@ const saleSchema = new mongoose.Schema(
 
         cashier: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "user",
             required: true
         },
             paymentMethod: {

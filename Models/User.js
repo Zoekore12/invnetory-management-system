@@ -25,10 +25,6 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    profilePic:{
-        type : String,
-        required:false
-    },
     hasAdminAccess :{
         type : Boolean,
         default :false
@@ -38,11 +34,45 @@ const userSchema = new mongoose.Schema({
         enum:["SuperAdmin","User","StoreKeeper","Admin","Cashier"],
         default:"User"
     },
+     profilePic: {
+            url: {
+                type: String,
+                default: null
+            },
+
+            publicId: {
+                type: String,
+                default: null
+            }
+    },
+    emailVerified: {
+    type: Boolean,
+    default: false
+    },
+
+    emailVerificationCode: {
+    type: String,
+    default: null
+    },
+
+    emailVerificationExpires: {
+    type: Date,
+    default: null
+    },
+    lastLoginAt: {
+        type: Date,
+        default: null
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    }
 },
 {timestamps: true},//date created and updated
 );
 //model
 
-const user = mongoose.model('user',userSchema)
 
-module.exports = user;// export user
+module.exports =
+    mongoose.models.user ||
+    mongoose.model("user", userSchema);// export user
