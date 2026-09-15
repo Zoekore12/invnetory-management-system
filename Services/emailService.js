@@ -75,10 +75,7 @@ const sendEmailVerificationCode = async (email, code) => {
             `
         });
 
-        console.log("EMAIL SENT SUCCESSFULLY");
-        console.log("Message ID:", info.messageId);
-        console.log("Accepted:", info.accepted);
-        console.log("Rejected:", info.rejected);
+    
 
         return info;
 

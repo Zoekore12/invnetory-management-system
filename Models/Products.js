@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema({
         type : Number,
         required: true,
     },
+    supplier: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Supplier",
+        required: true,
+    },
 },
 {
 timestamps: true //Date created and updated

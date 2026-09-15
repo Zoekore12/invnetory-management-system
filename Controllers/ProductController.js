@@ -5,10 +5,10 @@ const {logActivity}= require("./activityController");
 //creating product
 exports.createProduct = async (req, res) =>{
     try{
-        const {name, size , description , price , quantity} = req.body;
+        const {name, size , description , price , quantity, supplier} = req.body;
 
         if(
-            !name||!size||!description||!price||!quantity
+            !name||!size||!description||!price||!quantity||!supplier
         ){
            return res.status(400).json({message: 'please input all required fields'});
         }
@@ -36,7 +36,8 @@ exports.createProduct = async (req, res) =>{
             image,
             description,
             price,
-            quantity
+            quantity,
+            supplier
 
     });
      // Activity Logging
@@ -51,7 +52,8 @@ exports.createProduct = async (req, res) =>{
                 image: product.image,
                 size: product.size,
                 price: product.price,
-                quantity: product.quantity
+                quantity: product.quantity,
+                supplier: product.supplier
             }
         });
         await product.save();
@@ -70,9 +72,9 @@ exports.createProduct = async (req, res) =>{
 exports.updateProduct = async (req,res)=>{
     try{
         const {id} = req.params;
-        const {name,size,description,price} = req.body;
+        const {name,size,description,price,supplier} = req.body;
         
-        const product = await Product.findByIdAndUpdate(id,{name,size,description,price},{new:true,runValidators:true});
+        const product = await Product.findByIdAndUpdate(id,{name,size,description,price,supplier},{new:true,runValidators:true});
         if(!product){
             return res.status(404).json({message: "Product not found"})
         }

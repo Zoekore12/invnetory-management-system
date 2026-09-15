@@ -278,7 +278,7 @@ exports.verifyPayment = async (req, res) => {
                     },
 
                     {
-                        new: true
+                        returnDocument: "after"
                     }
                 );
 
@@ -308,7 +308,7 @@ exports.verifyPayment = async (req, res) => {
             "processing";
 
         // LOG ACTIVITY    
-        await logActivity.create({
+        await logActivity({
             userId: req.user.id,
             action: "PAYMENT_SUCCESS",
             description: `Payment successful for order ${order.orderNumber}`,

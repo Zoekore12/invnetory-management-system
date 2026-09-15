@@ -7,8 +7,6 @@ const approvedRoles = require("../Middleware/ApprovedRole");
 const upload = require("../Middleware/upload");
 
 //importing product controller
-const productController = require('../Controllers/ProductController');
-
 const {createProduct,updateProduct,updateItem,getAllProducts,getProductById,deleteProduct} = require("../Controllers/ProductController");
 
 

@@ -8,6 +8,15 @@ const shipbubble = axios.create({
     }
 });
 
+const validateAddress = async (data) => {
+    const response = await shipbubble.post(
+        "/shipping/address/validate",
+        data
+    );
+
+    return response.data;
+};
+
 const fetchShippingRates = async (data) => {
     const response = await shipbubble.post(
         "/shipping/fetch_rates",
@@ -26,5 +35,13 @@ const createShipment = async (data) => {
     return response.data;
 };
 
+const getPackageCategories = async () => {
+    const response = await shipbubble.get(
+        "/shipping/labels/categories"
+    );
 
-module.exports = {  fetchShippingRates, createShipment };
+    return response.data;
+};
+
+
+module.exports = {  fetchShippingRates, createShipment,validateAddress,getPackageCategories };
